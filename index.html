@@ -1,272 +1,174 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DANCOWW😹</title>
+<!DOCTYPE html>  <html lang="id">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>DANCOWW😹</title>  <style>  
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Special+Elite&display=swap');  
+  
+body{  
+  margin:0;  
+  background:black;  
+  color:white;  
+  font-family:'Special Elite', monospace;  
+}  
+  
+/* wallpaper */  
+body::before{  
+  content:"";  
+  position:fixed;  
+  width:100%;height:100%;  
+  background:url('cb823fcb-d202-41a0-be4c-872783161abd.jpeg') center/cover no-repeat;  
+  filter:blur(2px) brightness(0.7);  
+  z-index:-1;  
+}  
+  
+/* login */  
+.login{  
+  position:fixed;  
+  width:100%;height:100%;  
+  background:black;  
+  display:flex;  
+  justify-content:center;  
+  align-items:center;  
+  flex-direction:column;  
+  z-index:10;  
+  text-align:center;  
+}  
+  
+/* zalgo */  
+.zalgo{  
+  font-family:'Creepster';  
+  color:red;  
+  text-shadow:0 0 5px red,0 0 15px black;  
+  animation:flicker 2s infinite;  
+}  
+  
+.kecil{font-size:14px;}  
+  
+@keyframes flicker{  
+  0%,100%{opacity:1}  
+  50%{opacity:0.5}  
+}  
+  
+/* IG */  
+.ig{  
+  color:white;  
+  text-decoration:none;  
+  border:1px solid red;  
+  padding:8px;  
+  margin-top:10px;  
+}  
+.ig:hover{background:red;}  
+  
+/* warning */  
+.info{  
+  font-size:12px;  
+  color:#aaa;  
+  margin-top:15px;  
+  max-width:250px;  
+}  
+  
+/* header */  
+header{  
+  text-align:center;  
+  padding:20px;  
+  font-size:40px;  
+  font-family:'Nosifer', cursive;  
+  color:red;  
+  animation:shake 1.5s infinite;  
+}  
+  
+@keyframes shake{  
+  0%{transform:translate(0)}  
+  50%{transform:translate(-2px,2px)}  
+  100%{transform:translate(0)}  
+}  
+  
+/* gallery */  
+.gallery{  
+  display:grid;  
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));  
+  gap:10px;  
+  padding:20px;  
+}  
+  
+.gallery img{  
+  width:100%;  
+  border-radius:10px;  
+  transition:.3s;  
+}  
+.gallery img:hover{  
+  transform:scale(1.1);  
+}  
+  
+/* glitch text */  
+.glitch{  
+  text-align:center;  
+  font-size:30px;  
+  font-family:'Creepster';  
+  color:red;  
+  animation:flicker 3s infinite;  
+}  
+  
+/* flash */  
+#flash{  
+  position:fixed;  
+  width:100%;  
+  height:100%;  
+  background:red;  
+  opacity:0;  
+  pointer-events:none;  
+  z-index:999;  
+  transition:0.3s;  
+}  
+</style>  </head>  <body>  <div id="flash"></div>  <!-- LOGIN -->  <div class="login" id="login">  
+<h2 class="zalgo">M̷A̷S̷U̷K̷ ̷S̷E̷K̷A̷R̷A̷N̷G̷...</h2>  <button onclick="masuk()">ENTER</button>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Special+Elite&display=swap');
+<a href="https://www.instagram.com/4rknnnajaaa?igsh=MWM5cGNvbmJheDI5cw==" target="_blank" class="ig">  
+📱 FOLLOW IG GW  
+</a>  <p class="zalgo kecil">  
+J̷A̷N̷G̷A̷N̷ ̷L̷U̷P̷A̷ ̷F̷O̷L̷L̷O̷W̷ ̷A̷K̷U̷N̷ ̷G̷W̷  
+</p>  <p class="info">  
+⚠️ PERINGATAN ⚠️<br>  
+• Bukan Link P Bro<br>  
+• Punya @4rknnnajaa<br>  
+• Disarankan pakai headset 🎧  
+</p>  
+</div>  <!-- MAIN -->  <header>DANC0W😱</header>  
+<div class="glitch">YOU ARE WATCHED</div>  <div class="gallery">  
+<img src="motion_photo_7523844779172652385~2.jpg">  
+<img src="IMG_20260324_225639_424.jpg">  
+<img src="IMG_20260324_225639_382.jpg">  
+<img src="motion_photo_5823942349673579073.jpg">  
+<img src="motion_photo_7247671055954824122.jpg">  
+<img src="motion_photo_5808118521687866893~2.jpg">  
+</div>  <audio id="audio"></audio>
 
-body{
-  margin:0;
-  background:black;
-  color:white;
-  font-family:'Special Elite', monospace;
-  overflow-x:hidden;
-}
-
-/* wallpaper */
-body::before{
-  content:"";
-  position:fixed;
-  width:100%;height:100%;
-  background:url('cb823fcb-d202-41a0-be4c-872783161abd.jpeg') center/cover no-repeat;
-  filter:blur(2px) brightness(0.7);
-  z-index:-1;
-}
-
-/* login */
-.login{
-  position:fixed;
-  width:100%;height:100%;
-  background:black;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:10;
-  text-align:center;
-}
-
-/* zalgo */
-.zalgo{
-  font-family:'Creepster';
-  color:red;
-  text-shadow:0 0 5px red,0 0 15px black;
-  animation:flicker 2s infinite;
-}
-.kecil{font-size:14px;}
-
-@keyframes flicker{
-  0%,100%{opacity:1}
-  50%{opacity:0.5}
-}
-
-/* IG button */
-.ig{
-  color:white;
-  text-decoration:none;
-  border:1px solid red;
-  padding:8px;
-  margin-top:10px;
-  display:inline-block;
-}
-.ig:hover{background:red;}
-
-/* warning */
-.info{
-  font-size:12px;
-  color:#aaa;
-  margin-top:15px;
-  max-width:250px;
-}
-
-/* header */
-header{
-  text-align:center;
-  padding:20px;
-  font-size:40px;
-  font-family:'Nosifer', cursive;
-  color:red;
-  animation:shake 1.5s infinite;
-}
-
-@keyframes shake{
-  0%{transform:translate(0)}
-  50%{transform:translate(-2px,2px)}
-  100%{transform:translate(0)}
-}
-
-/* gallery */
-.gallery{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:10px;
-  padding:20px;
-  z-index:2;
-  position:relative;
-}
-.gallery img{
-  width:100%;
-  border-radius:10px;
-  transition:.3s;
-  cursor:pointer;
-}
-.gallery img:hover{
-  transform:scale(1.1);
-  filter:drop-shadow(0 0 15px red);
-}
-
-/* glitch text */
-.glitch{
-  text-align:center;
-  font-size:30px;
-  font-family:'Creepster';
-  color:red;
-  animation:flicker 3s infinite;
-}
-
-/* floating neon quotes */
-.neon-text{
-  position:absolute;
-  font-size:2rem;
-  font-family:'Creepster';
-  color:#ff4c4c;
-  text-shadow:0 0 5px #ff4c4c,0 0 15px #ff0000;
-  white-space:nowrap;
-  pointer-events:none;
-  animation:float 5s linear forwards;
-  z-index:5;
-}
-@keyframes float{
-  0%{transform:translateY(100vh); opacity:0}
-  10%{opacity:1}
-  100%{transform:translateY(-50px); opacity:0}
-}
-
-/* flash */
-#flash{
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:red;
-  opacity:0;
-  pointer-events:none;
-  z-index:999;
-  transition:0.3s;
-}
-
-/* Spotify player */
-.spotify-player{
-  position:fixed;
-  bottom:20px;
-  width:90%;
-  max-width:320px;
-  height:80px;
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 0 20px rgba(255,0,0,0.5);
-  z-index:10;
-}
-
-iframe{
-  width:100%;
-  height:100%;
-  border:none;
-}
-</style>
-</head>
-
-<body>
-
-<div id="flash"></div>
-
-<!-- LOGIN -->
-<div class="login" id="login">
-<h2 class="zalgo">M̷A̷S̷U̷K̷ ̷S̷E̷K̷A̷R̷A̷N̷G̷...</h2>
-
-<button onclick="masuk()">ENTER</button>
-
-<a href="https://www.instagram.com/4rknnnajaaa?igsh=MWM5cGNvbmJheDI5cw==" target="_blank" class="ig">
-📱 FOLLOW IG GW
-</a>
-
-<p class="zalgo kecil">
-J̷A̷N̷G̷A̷N̷ ̷L̷U̷P̷A̷ ̷F̷O̷L̷L̷O̷W̷ ̷A̷K̷U̷N̷ ̷G̷W̷
-</p>
-
-<p class="info">
-⚠️ PERINGATAN ⚠️<br>
-• Bukan Link P Bro<br>
-• Punya @4rknnnajaa<br>
-• Disarankan pakai headset 🎧
-</p>
-</div>
-
-<!-- MAIN -->
-<header>DANC0W😱</header>
-<div class="glitch">YOU ARE WATCHED</div>
-
-<div class="gallery">
-<a href="https://instagram.com" target="_blank"><img src="motion_photo_7523844779172652385~2.jpg"></a>
-<a href="https://instagram.com" target="_blank"><img src="IMG_20260324_225639_424.jpg"></a>
-<a href="https://instagram.com" target="_blank"><img src="IMG_20260324_225639_382.jpg"></a>
-<a href="https://instagram.com" target="_blank"><img src="motion_photo_5823942349673579073.jpg"></a>
-<a href="https://instagram.com" target="_blank"><img src="motion_photo_7247671055954824122.jpg"></a>
-<a href="https://instagram.com" target="_blank"><img src="motion_photo_5808118521687866893~2.jpg"></a>
-</div>
-
-<div id="neonContainer"></div>
-
-<div class="spotify-player">
-  <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX7qK8ma5wgG1?utm_source=generator" 
-  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
-</div>
-
-<audio id="audio"></audio>
-
-<script>
-// masuk / login
-function masuk(){
-  const flash = document.getElementById('flash');
-  const audio = document.getElementById('audio');
-
-  flash.style.opacity = "1";
-
-  const enterSound = new Audio("original sound - 00.18.0h_musicaldown.com_1774641360.mp3");
-  enterSound.volume = 0.06;
-  enterSound.play();
-
-  setTimeout(()=>{
-    flash.style.opacity = "0";
-    document.getElementById('login').style.display='none';
-
-    audio.src = "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/Brazilian_Street/Komiku_-_03_-_Brazilian_Street.mp3";
-    audio.play();
-  },600);
-}
-
-// smooth camera effect
-setInterval(()=>{
-  let x = (Math.random()-0.5)*2;
-  let y = (Math.random()-0.5)*2;
-  document.body.style.transform = `translate(${x}px, ${y}px)`;
-},2000);
-
-// neon floating quotes
-const quotes = [
-  "Aku rindu yang tak mungkin kembali...",
-  "Hujan di kota ini mengingatkanku padamu...",
-  "Sendiri lebih sakit dari yang ku kira...",
-  "Kenanganmu masih membekas di hati...",
-  "Aku tersesat dalam bayanganmu..."
-];
-
-const container = document.getElementById("neonContainer");
-
-function showQuote(){
-  const quote = document.createElement("div");
-  quote.classList.add("neon-text");
-  quote.style.left = Math.random() * (window.innerWidth - 300) + "px";
-  quote.textContent = quotes[Math.floor(Math.random() * quotes.length)];
-  container.appendChild(quote);
-
-  setTimeout(()=>quote.remove(),5000);
-}
-
-setInterval(showQuote,1500);
-</script>
-
-</body>
+<script>  
+function masuk(){  
+  const flash = document.getElementById('flash');  
+  const audio = document.getElementById('audio');  
+  
+  flash.style.opacity = "1";  
+  
+  const enterSound = new Audio("original sound - 00.18.0h_musicaldown.com_1774641360.mp3");  
+  enterSound.volume = 0.06;  
+  enterSound.play();  
+  
+  setTimeout(()=>{  
+    flash.style.opacity = "0";  
+    document.getElementById('login').style.display='none';  
+  
+    audio.src = "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/Brazilian_Street/Komiku_-_03_-_Brazilian_Street.mp3";  
+    audio.play();  
+  },600);  
+}  
+  
+// smooth camera effect  
+setInterval(()=>{  
+  let x = (Math.random()-0.5)*2;  
+  let y = (Math.random()-0.5)*2;  
+  document.body.style.transform = `translate(${x}px, ${y}px)`;  
+},2000);  
+</script>  </body>  
 </html>
