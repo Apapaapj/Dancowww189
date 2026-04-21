@@ -1,131 +1,136 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>iPhone Camera Web</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Game Dashboard</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
 
-<style>
-body {
-  margin:0;
-  background:black;
-  font-family:-apple-system;
-  color:white;
-  text-align:center;
-}
+    body {
+      background: radial-gradient(circle at top, #1b1b2f, #000);
+      color: white;
+      min-height: 100vh;
+    }
 
-video {
-  width:100%;
-  height:80vh;
-  object-fit:cover;
-  background:black;
-}
+    header {
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+    }
 
-.controls {
-  position:fixed;
-  bottom:20px;
-  width:100%;
-}
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
 
-button {
-  border:none;
-  border-radius:50%;
-  padding:15px;
-  margin:8px;
-}
+    .balance {
+      background: rgba(255,255,255,0.08);
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
 
-#shutter {
-  width:70px;
-  height:70px;
-  background:white;
-}
+    .balance h2 {
+      font-size: 28px;
+      color: #00ffcc;
+    }
 
-.mode {
-  background:rgba(255,255,255,0.2);
-  color:white;
-  padding:8px 14px;
-  border-radius:20px;
-}
-</style>
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.07);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      background: rgba(255,255,255,0.12);
+    }
+
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-box {
+      background: #111;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 300px;
+    }
+
+    .popup-box button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      background: #00ffcc;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
 </head>
-
 <body>
 
-<video id="video" autoplay playsinline></video>
+<header>🎮Game Dashboard</header>
 
-<div class="controls">
-  <button class="mode" onclick="setZoom(0.5)">0.5</button>
-  <button id="shutter" onclick="takePhoto()"></button>
-  <button class="mode" onclick="setZoom(1)">1x</button>
-  <button class="mode" onclick="setZoom(2)">2x</button>
-  <button class="mode" onclick="startLive()">LIVE</button>
+<div class="container">
+
+  <div class="balance">
+    <p> Balance</p>
+    <h2>Rp 3.000.000</h2>
+    <small style="opacity:0.7">*JIKA ANDA INGIN MENARIK UANG INI WAJIB DEPOSIT TERLEBIH DAHULU MINIMAL 200K*</small>
+  </div>
+
+  <div class="grid">
+    <div class="card" onclick="openPopup('Mahjong')">🀄 Mahjong</div>
+    <div class="card" onclick="openPopup('Space Adventure')">🚀 Space</div>
+    <div class="card" onclick="openPopup('Puzzle Game')">🧩 Puzzle</div>
+    <div class="card" onclick="openPopup('Card Game')">🂰 Cards</div>
+  </div>
+
+</div>
+
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <h3 id="popupText">Game</h3>
+    <p style="margin-top:10px">Mode Slot - DEPOSIT TERLEBIH DAHULU HUB 085168143056</p>
+    <button onclick="closePopup()">OUT</button>
+  </div>
 </div>
 
 <script>
-let video = document.getElementById("video")
-let stream
-let zoom = 1
-
-// START CAMERA (FIX BLACK SCREEN)
-async function startCam(){
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: false
-    })
-    video.srcObject = stream
-  }catch(e){
-    alert("❌ Kamera gagal: " + e.message)
-  }
-}
-startCam()
-
-// ZOOM SIMULASI
-function setZoom(z){
-  zoom = z
-  if(z === 0.5){
-    video.style.transform = "scale(0.7)"
-  }else if(z === 2){
-    video.style.transform = "scale(1.5)"
-  }else{
-    video.style.transform = "scale(1)"
-  }
+function openPopup(name){
+  document.getElementById('popupText').innerText = name;
+  document.getElementById('popup').style.display = 'flex';
 }
 
-// FOTO
-function takePhoto(){
-  let canvas = document.createElement("canvas")
-  canvas.width = video.videoWidth
-  canvas.height = video.videoHeight
-  let ctx = canvas.getContext("2d")
-
-  ctx.drawImage(video,0,0)
-
-  let a = document.createElement("a")
-  a.href = canvas.toDataURL("image/png")
-  a.download = "foto.png"
-  a.click()
-}
-
-// LIVE (VIDEO PENDEK)
-function startLive(){
-  let recorder = new MediaRecorder(stream)
-  let data = []
-
-  recorder.ondataavailable = e => data.push(e.data)
-
-  recorder.onstop = () => {
-    let blob = new Blob(data, {type:"video/webm"})
-    let url = URL.createObjectURL(blob)
-
-    let a = document.createElement("a")
-    a.href = url
-    a.download = "live.webm"
-    a.click()
-  }
-
-  recorder.start()
-  setTimeout(()=>recorder.stop(),2000)
+function closePopup(){
+  document.getElementById('popup').style.display = 'none';
 }
 </script>
 
