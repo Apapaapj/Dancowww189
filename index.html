@@ -1,244 +1,203 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Photo Booth Pro</title>
-  <style>
-    :root{
-      --bg:#0f1115; --card:#171a21; --text:#e8ecf1; --muted:#9aa3b2;
-      --accent:#6ea8fe; --danger:#ff6b6b;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
-      background:linear-gradient(180deg,#0b0d12,#121622);
-      color:var(--text);
-      display:flex; flex-direction:column; align-items:center; gap:14px; padding:14px;
-    }
-    .wrap{width:100%; max-width:420px}
-    .card{
-      background:var(--card); border-radius:16px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-    h2{margin:6px 0 10px; text-align:center}
-    .stage{
-      position:relative; overflow:hidden; border-radius:14px; background:#000;
-    }
-    video, canvas{
-      width:100%; height:auto; display:block;
-    }
-    .overlay{
-      position:absolute; inset:0; pointer-events:none;
-      display:flex; align-items:center; justify-content:center;
-      font-size:56px; font-weight:700; color:#fff;
-      text-shadow:0 4px 20px rgba(0,0,0,.6);
-      opacity:0; transition:.2s;
-    }
-    .flash{
-      position:absolute; inset:0; background:#fff; opacity:0;
-      transition:opacity .15s ease;
-    }
-    .controls{
-      display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:10px;
-    }
-    button, select{
-      padding:10px 12px; border-radius:10px; border:none; cursor:pointer;
-      background:#232838; color:var(--text);
-    }
-    button.primary{background:var(--accent); color:#0b1220; font-weight:600}
-    button.warn{background:var(--danger); color:#200}
-    .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
-    .small{font-size:12px; color:var(--muted)}
-    .preview{
-      margin-top:10px; border-radius:12px; overflow:hidden; background:#000;
-    }
-    .footer{font-size:12px; color:var(--muted); text-align:center}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>iCam Web Pro</title>
+<style>
+  :root{
+    --bg:#000; --ui:rgba(20,20,20,.65); --txt:#fff; --accent:#ffd60a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#000;color:#fff;font-family:-apple-system,system-ui}
+  .stage{position:relative;height:100vh;overflow:hidden;background:#000}
+  video{width:100%;height:100%;object-fit:cover;transition:transform .2s ease}
+  .top, .bottom{
+    position:absolute;left:0;right:0;padding:10px 14px;
+    display:flex;align-items:center;justify-content:space-between;
+    background:linear-gradient(to bottom, rgba(0,0,0,.5), transparent);
+  }
+  .bottom{
+    top:auto;bottom:0;
+    background:linear-gradient(to top, rgba(0,0,0,.6), transparent);
+    flex-direction:column;gap:10px
+  }
+  .pill{background:var(--ui);backdrop-filter:blur(10px);border-radius:20px;padding:6px 10px}
+  .modes{display:flex;gap:16px;justify-content:center}
+  .mode{opacity:.6}
+  .mode.active{opacity:1;font-weight:600}
+  .zoom{display:flex;gap:10px}
+  .zoom button{
+    border:none;background:var(--ui);color:#fff;border-radius:16px;padding:6px 10px
+  }
+  .zoom .active{background:#fff;color:#000}
+  .controls{display:flex;align-items:center;justify-content:space-between;width:100%}
+  .shutter{
+    width:76px;height:76px;border-radius:50%;
+    background:#fff;display:flex;align-items:center;justify-content:center
+  }
+  .shutter::after{
+    content:"";width:60px;height:60px;border-radius:50%;background:#fff;
+  }
+  .btn{background:var(--ui);border:none;color:#fff;border-radius:12px;padding:8px 10px}
+  .grid{position:absolute;inset:0;pointer-events:none;opacity:.35}
+  .grid div{position:absolute;background:#fff}
+  .grid .v{width:1px;height:100%}
+  .grid .h{height:1px;width:100%}
+  .focus{
+    position:absolute;width:80px;height:80px;border:2px solid var(--accent);
+    border-radius:12px;transform:translate(-50%,-50%) scale(.8);
+    opacity:0;pointer-events:none;transition:.2s
+  }
+  .flash{position:absolute;inset:0;background:#fff;opacity:0;transition:.12s}
+  .hint{font-size:12px;opacity:.8;text-align:center}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h2>📸 Photo Booth Pro</h2>
+<div class="stage" id="stage">
+  <video id="video" autoplay playsinline></video>
 
-      <div class="stage">
-        <video id="video" autoplay playsinline></video>
-        <div id="overlay" class="overlay">3</div>
-        <div id="flash" class="flash"></div>
-      </div>
-
-      <div class="controls">
-        <button id="btnStart" class="primary">Mulai Kamera</button>
-        <button id="btnSwitch">Ganti Kamera</button>
-
-        <button id="btnShot" class="primary">Ambil Foto</button>
-        <button id="btnCountdown">Countdown (3s)</button>
-
-        <select id="filter">
-          <option value="none">Filter: Normal</option>
-          <option value="vintage">Vintage</option>
-          <option value="bw">B/W</option>
-          <option value="warm">Warm</option>
-          <option value="cool">Cool</option>
-          <option value="contrast">High Contrast</option>
-        </select>
-        <button id="btnMirror">Mirror: OFF</button>
-      </div>
-
-      <div class="row">
-        <button id="btnDownload">Download</button>
-        <button id="btnClear" class="warn">Clear</button>
-      </div>
-
-      <div class="preview">
-        <canvas id="canvas"></canvas>
-      </div>
-
-      <div class="footer">Akan meminta izin kamera. Semua pemotretan dilakukan di perangkatmu.</div>
-    </div>
+  <!-- grid -->
+  <div class="grid" id="grid">
+    <div class="v" style="left:33%"></div>
+    <div class="v" style="left:66%"></div>
+    <div class="h" style="top:33%"></div>
+    <div class="h" style="top:66%"></div>
   </div>
 
+  <div class="focus" id="focus"></div>
+  <div class="flash" id="flash"></div>
+
+  <!-- top -->
+  <div class="top">
+    <div class="pill">HDR • Auto</div>
+    <div class="pill">⚙️</div>
+  </div>
+
+  <!-- bottom -->
+  <div class="bottom">
+    <div class="modes">
+      <span class="mode">VIDEO</span>
+      <span class="mode active" id="modePhoto">PHOTO</span>
+      <span class="mode">SQUARE</span>
+    </div>
+
+    <div class="zoom">
+      <button id="z05">0.5</button>
+      <button id="z1" class="active">1x</button>
+      <button id="z2">2x</button>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="switch">🔄</button>
+      <div class="shutter" id="shutter"></div>
+      <button class="btn" id="live">LIVE</button>
+    </div>
+
+    <div class="hint">Tap layar untuk fokus • Tahan LIVE untuk video pendek</div>
+  </div>
+</div>
+
 <script>
-  const video = document.getElementById('video')
-  const canvas = document.getElementById('canvas')
-  const ctx = canvas.getContext('2d')
-  const overlay = document.getElementById('overlay')
-  const flash = document.getElementById('flash')
+const video = document.getElementById('video')
+const stage = document.getElementById('stage')
+const focusBox = document.getElementById('focus')
+const flash = document.getElementById('flash')
 
-  const btnStart = document.getElementById('btnStart')
-  const btnSwitch = document.getElementById('btnSwitch')
-  const btnShot = document.getElementById('btnShot')
-  const btnCountdown = document.getElementById('btnCountdown')
-  const btnDownload = document.getElementById('btnDownload')
-  const btnClear = document.getElementById('btnClear')
-  const filterSel = document.getElementById('filter')
-  const btnMirror = document.getElementById('btnMirror')
+let stream, facing='environment', zoom=1
+let mediaRecorder, chunks=[]
 
-  let stream = null
-  let facing = "user" // front/back
-  let mirror = false
-  let lastImage = null
-
-  async function startCamera(){
-    try{
-      if(stream) stream.getTracks().forEach(t=>t.stop())
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: facing }, audio:false
-      })
-      video.srcObject = stream
-    }catch(e){
-      alert("Kamera tidak diizinkan / tidak tersedia")
-    }
+async function startCam(){
+  try{
+    if(stream) stream.getTracks().forEach(t=>t.stop())
+    stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode: facing }, audio:false
+    })
+    video.srcObject = stream
+  }catch(e){
+    alert('Kamera tidak tersedia / izin ditolak')
   }
+}
+startCam()
 
-  function switchCamera(){
-    facing = (facing === "user") ? "environment" : "user"
-    startCamera()
+// zoom (simulasi 0.5/1/2)
+function setZoom(z){
+  zoom = z
+  document.getElementById('z05').classList.toggle('active', z===0.5)
+  document.getElementById('z1').classList.toggle('active', z===1)
+  document.getElementById('z2').classList.toggle('active', z===2)
+
+  if(z===0.5){
+    video.style.transform = 'scale(0.75)' // efek wide
+  } else if(z===2){
+    video.style.transform = 'scale(1.6)' // crop zoom
+  } else {
+    video.style.transform = 'scale(1)'
   }
+}
+z05.onclick=()=>setZoom(0.5)
+z1.onclick=()=>setZoom(1)
+z2.onclick=()=>setZoom(2)
 
-  function setMirror(){
-    mirror = !mirror
-    video.style.transform = mirror ? "scaleX(-1)" : "scaleX(1)"
-    btnMirror.textContent = "Mirror: " + (mirror ? "ON" : "OFF")
-  }
+// switch camera
+switch.onclick = ()=>{
+  facing = (facing==='user') ? 'environment' : 'user'
+  startCam()
+}
 
-  function applyFilter(ctx, w, h){
-    const f = filterSel.value
-    if(f === "none") return
-    const img = ctx.getImageData(0,0,w,h)
-    const d = img.data
+// tap to focus (indikator + auto exposure ringan)
+stage.addEventListener('click', (e)=>{
+  const rect = stage.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  focusBox.style.left = x+'px'
+  focusBox.style.top = y+'px'
+  focusBox.style.opacity = 1
+  focusBox.style.transform = 'translate(-50%,-50%) scale(1)'
+  setTimeout(()=>{
+    focusBox.style.opacity = 0
+    focusBox.style.transform = 'translate(-50%,-50%) scale(.8)'
+  },800)
+})
 
-    for(let i=0;i<d.length;i+=4){
-      let r=d[i], g=d[i+1], b=d[i+2]
+// ambil foto
+function takePhoto(){
+  const c = document.createElement('canvas')
+  c.width = video.videoWidth
+  c.height = video.videoHeight
+  const ctx = c.getContext('2d')
+  ctx.drawImage(video,0,0)
 
-      if(f==="bw"){
-        const avg=(r+g+b)/3
-        d[i]=d[i+1]=d[i+2]=avg
-      }
-      if(f==="vintage"){
-        d[i]=r*0.9+20
-        d[i+1]=g*0.7+15
-        d[i+2]=b*0.4+10
-      }
-      if(f==="warm"){
-        d[i]=r+20
-      }
-      if(f==="cool"){
-        d[i+2]=b+20
-      }
-      if(f==="contrast"){
-        d[i]=((r-128)*1.4)+128
-        d[i+1]=((g-128)*1.4)+128
-        d[i+2]=((b-128)*1.4)+128
-      }
-    }
+  // flash
+  flash.style.opacity=1
+  setTimeout(()=>flash.style.opacity=0,120)
 
-    ctx.putImageData(img,0,0)
-  }
+  const a = document.createElement('a')
+  a.href = c.toDataURL('image/png')
+  a.download = 'photo.png'
+  a.click()
+}
 
-  function takePhoto(){
-    const w = video.videoWidth
-    const h = video.videoHeight
-    canvas.width = w
-    canvas.height = h
-
-    if(mirror){
-      ctx.translate(w,0)
-      ctx.scale(-1,1)
-    }
-
-    ctx.drawImage(video,0,0,w,h)
-
-    if(mirror){
-      ctx.setTransform(1,0,0,1,0,0)
-    }
-
-    applyFilter(ctx,w,h)
-
-    // flash effect
-    flash.style.opacity = 1
-    setTimeout(()=> flash.style.opacity = 0, 120)
-
-    lastImage = canvas.toDataURL("image/png")
-  }
-
-  function countdownShot(){
-    let n = 3
-    overlay.style.opacity = 1
-    overlay.textContent = n
-
-    const timer = setInterval(()=>{
-      n--
-      if(n<=0){
-        clearInterval(timer)
-        overlay.style.opacity = 0
-        takePhoto()
-      } else {
-        overlay.textContent = n
-      }
-    },1000)
-  }
-
-  function download(){
-    if(!lastImage) return alert("Belum ada foto")
-    const a = document.createElement("a")
-    a.href = lastImage
-    a.download = "foto.png"
+// live (rekam video pendek ~2 detik)
+function startLive(){
+  chunks=[]
+  const recStream = video.srcObject
+  mediaRecorder = new MediaRecorder(recStream, { mimeType:'video/webm' })
+  mediaRecorder.ondataavailable = e=>chunks.push(e.data)
+  mediaRecorder.onstop = ()=>{
+    const blob = new Blob(chunks,{type:'video/webm'})
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'live.webm'
     a.click()
   }
+  mediaRecorder.start()
+  setTimeout(()=>mediaRecorder.stop(), 2000)
+}
 
-  function clearCanvas(){
-    ctx.clearRect(0,0,canvas.width,canvas.height)
-    lastImage = null
-  }
-
-  btnStart.onclick = startCamera
-  btnSwitch.onclick = switchCamera
-  btnMirror.onclick = setMirror
-  btnShot.onclick = takePhoto
-  btnCountdown.onclick = countdownShot
-  btnDownload.onclick = download
-  btnClear.onclick = clearCanvas
+shutter.onclick = takePhoto
+live.onclick = startLive
 </script>
-
 </body>
 </html>
