@@ -1,203 +1,133 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>iCam Web Pro</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iPhone Camera Web</title>
+
 <style>
-  :root{
-    --bg:#000; --ui:rgba(20,20,20,.65); --txt:#fff; --accent:#ffd60a;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:#000;color:#fff;font-family:-apple-system,system-ui}
-  .stage{position:relative;height:100vh;overflow:hidden;background:#000}
-  video{width:100%;height:100%;object-fit:cover;transition:transform .2s ease}
-  .top, .bottom{
-    position:absolute;left:0;right:0;padding:10px 14px;
-    display:flex;align-items:center;justify-content:space-between;
-    background:linear-gradient(to bottom, rgba(0,0,0,.5), transparent);
-  }
-  .bottom{
-    top:auto;bottom:0;
-    background:linear-gradient(to top, rgba(0,0,0,.6), transparent);
-    flex-direction:column;gap:10px
-  }
-  .pill{background:var(--ui);backdrop-filter:blur(10px);border-radius:20px;padding:6px 10px}
-  .modes{display:flex;gap:16px;justify-content:center}
-  .mode{opacity:.6}
-  .mode.active{opacity:1;font-weight:600}
-  .zoom{display:flex;gap:10px}
-  .zoom button{
-    border:none;background:var(--ui);color:#fff;border-radius:16px;padding:6px 10px
-  }
-  .zoom .active{background:#fff;color:#000}
-  .controls{display:flex;align-items:center;justify-content:space-between;width:100%}
-  .shutter{
-    width:76px;height:76px;border-radius:50%;
-    background:#fff;display:flex;align-items:center;justify-content:center
-  }
-  .shutter::after{
-    content:"";width:60px;height:60px;border-radius:50%;background:#fff;
-  }
-  .btn{background:var(--ui);border:none;color:#fff;border-radius:12px;padding:8px 10px}
-  .grid{position:absolute;inset:0;pointer-events:none;opacity:.35}
-  .grid div{position:absolute;background:#fff}
-  .grid .v{width:1px;height:100%}
-  .grid .h{height:1px;width:100%}
-  .focus{
-    position:absolute;width:80px;height:80px;border:2px solid var(--accent);
-    border-radius:12px;transform:translate(-50%,-50%) scale(.8);
-    opacity:0;pointer-events:none;transition:.2s
-  }
-  .flash{position:absolute;inset:0;background:#fff;opacity:0;transition:.12s}
-  .hint{font-size:12px;opacity:.8;text-align:center}
+body {
+  margin:0;
+  background:black;
+  font-family:-apple-system;
+  color:white;
+  text-align:center;
+}
+
+video {
+  width:100%;
+  height:80vh;
+  object-fit:cover;
+  background:black;
+}
+
+.controls {
+  position:fixed;
+  bottom:20px;
+  width:100%;
+}
+
+button {
+  border:none;
+  border-radius:50%;
+  padding:15px;
+  margin:8px;
+}
+
+#shutter {
+  width:70px;
+  height:70px;
+  background:white;
+}
+
+.mode {
+  background:rgba(255,255,255,0.2);
+  color:white;
+  padding:8px 14px;
+  border-radius:20px;
+}
 </style>
 </head>
+
 <body>
-<div class="stage" id="stage">
-  <video id="video" autoplay playsinline></video>
 
-  <!-- grid -->
-  <div class="grid" id="grid">
-    <div class="v" style="left:33%"></div>
-    <div class="v" style="left:66%"></div>
-    <div class="h" style="top:33%"></div>
-    <div class="h" style="top:66%"></div>
-  </div>
+<video id="video" autoplay playsinline></video>
 
-  <div class="focus" id="focus"></div>
-  <div class="flash" id="flash"></div>
-
-  <!-- top -->
-  <div class="top">
-    <div class="pill">HDR • Auto</div>
-    <div class="pill">⚙️</div>
-  </div>
-
-  <!-- bottom -->
-  <div class="bottom">
-    <div class="modes">
-      <span class="mode">VIDEO</span>
-      <span class="mode active" id="modePhoto">PHOTO</span>
-      <span class="mode">SQUARE</span>
-    </div>
-
-    <div class="zoom">
-      <button id="z05">0.5</button>
-      <button id="z1" class="active">1x</button>
-      <button id="z2">2x</button>
-    </div>
-
-    <div class="controls">
-      <button class="btn" id="switch">🔄</button>
-      <div class="shutter" id="shutter"></div>
-      <button class="btn" id="live">LIVE</button>
-    </div>
-
-    <div class="hint">Tap layar untuk fokus • Tahan LIVE untuk video pendek</div>
-  </div>
+<div class="controls">
+  <button class="mode" onclick="setZoom(0.5)">0.5</button>
+  <button id="shutter" onclick="takePhoto()"></button>
+  <button class="mode" onclick="setZoom(1)">1x</button>
+  <button class="mode" onclick="setZoom(2)">2x</button>
+  <button class="mode" onclick="startLive()">LIVE</button>
 </div>
 
 <script>
-const video = document.getElementById('video')
-const stage = document.getElementById('stage')
-const focusBox = document.getElementById('focus')
-const flash = document.getElementById('flash')
+let video = document.getElementById("video")
+let stream
+let zoom = 1
 
-let stream, facing='environment', zoom=1
-let mediaRecorder, chunks=[]
-
+// START CAMERA (FIX BLACK SCREEN)
 async function startCam(){
   try{
-    if(stream) stream.getTracks().forEach(t=>t.stop())
     stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode: facing }, audio:false
+      video: true,
+      audio: false
     })
     video.srcObject = stream
   }catch(e){
-    alert('Kamera tidak tersedia / izin ditolak')
+    alert("❌ Kamera gagal: " + e.message)
   }
 }
 startCam()
 
-// zoom (simulasi 0.5/1/2)
+// ZOOM SIMULASI
 function setZoom(z){
   zoom = z
-  document.getElementById('z05').classList.toggle('active', z===0.5)
-  document.getElementById('z1').classList.toggle('active', z===1)
-  document.getElementById('z2').classList.toggle('active', z===2)
-
-  if(z===0.5){
-    video.style.transform = 'scale(0.75)' // efek wide
-  } else if(z===2){
-    video.style.transform = 'scale(1.6)' // crop zoom
-  } else {
-    video.style.transform = 'scale(1)'
+  if(z === 0.5){
+    video.style.transform = "scale(0.7)"
+  }else if(z === 2){
+    video.style.transform = "scale(1.5)"
+  }else{
+    video.style.transform = "scale(1)"
   }
 }
-z05.onclick=()=>setZoom(0.5)
-z1.onclick=()=>setZoom(1)
-z2.onclick=()=>setZoom(2)
 
-// switch camera
-switch.onclick = ()=>{
-  facing = (facing==='user') ? 'environment' : 'user'
-  startCam()
-}
-
-// tap to focus (indikator + auto exposure ringan)
-stage.addEventListener('click', (e)=>{
-  const rect = stage.getBoundingClientRect()
-  const x = e.clientX - rect.left
-  const y = e.clientY - rect.top
-  focusBox.style.left = x+'px'
-  focusBox.style.top = y+'px'
-  focusBox.style.opacity = 1
-  focusBox.style.transform = 'translate(-50%,-50%) scale(1)'
-  setTimeout(()=>{
-    focusBox.style.opacity = 0
-    focusBox.style.transform = 'translate(-50%,-50%) scale(.8)'
-  },800)
-})
-
-// ambil foto
+// FOTO
 function takePhoto(){
-  const c = document.createElement('canvas')
-  c.width = video.videoWidth
-  c.height = video.videoHeight
-  const ctx = c.getContext('2d')
+  let canvas = document.createElement("canvas")
+  canvas.width = video.videoWidth
+  canvas.height = video.videoHeight
+  let ctx = canvas.getContext("2d")
+
   ctx.drawImage(video,0,0)
 
-  // flash
-  flash.style.opacity=1
-  setTimeout(()=>flash.style.opacity=0,120)
-
-  const a = document.createElement('a')
-  a.href = c.toDataURL('image/png')
-  a.download = 'photo.png'
+  let a = document.createElement("a")
+  a.href = canvas.toDataURL("image/png")
+  a.download = "foto.png"
   a.click()
 }
 
-// live (rekam video pendek ~2 detik)
+// LIVE (VIDEO PENDEK)
 function startLive(){
-  chunks=[]
-  const recStream = video.srcObject
-  mediaRecorder = new MediaRecorder(recStream, { mimeType:'video/webm' })
-  mediaRecorder.ondataavailable = e=>chunks.push(e.data)
-  mediaRecorder.onstop = ()=>{
-    const blob = new Blob(chunks,{type:'video/webm'})
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
+  let recorder = new MediaRecorder(stream)
+  let data = []
+
+  recorder.ondataavailable = e => data.push(e.data)
+
+  recorder.onstop = () => {
+    let blob = new Blob(data, {type:"video/webm"})
+    let url = URL.createObjectURL(blob)
+
+    let a = document.createElement("a")
     a.href = url
-    a.download = 'live.webm'
+    a.download = "live.webm"
     a.click()
   }
-  mediaRecorder.start()
-  setTimeout(()=>mediaRecorder.stop(), 2000)
-}
 
-shutter.onclick = takePhoto
-live.onclick = startLive
+  recorder.start()
+  setTimeout(()=>recorder.stop(),2000)
+}
 </script>
+
 </body>
 </html>
