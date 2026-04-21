@@ -1,174 +1,244 @@
-<!DOCTYPE html>  <html lang="id">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>DANCOWW😹</title>  <style>  
-@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Special+Elite&display=swap');  
-  
-body{  
-  margin:0;  
-  background:black;  
-  color:white;  
-  font-family:'Special Elite', monospace;  
-}  
-  
-/* wallpaper */  
-body::before{  
-  content:"";  
-  position:fixed;  
-  width:100%;height:100%;  
-  background:url('cb823fcb-d202-41a0-be4c-872783161abd.jpeg') center/cover no-repeat;  
-  filter:blur(2px) brightness(0.7);  
-  z-index:-1;  
-}  
-  
-/* login */  
-.login{  
-  position:fixed;  
-  width:100%;height:100%;  
-  background:black;  
-  display:flex;  
-  justify-content:center;  
-  align-items:center;  
-  flex-direction:column;  
-  z-index:10;  
-  text-align:center;  
-}  
-  
-/* zalgo */  
-.zalgo{  
-  font-family:'Creepster';  
-  color:red;  
-  text-shadow:0 0 5px red,0 0 15px black;  
-  animation:flicker 2s infinite;  
-}  
-  
-.kecil{font-size:14px;}  
-  
-@keyframes flicker{  
-  0%,100%{opacity:1}  
-  50%{opacity:0.5}  
-}  
-  
-/* IG */  
-.ig{  
-  color:white;  
-  text-decoration:none;  
-  border:1px solid red;  
-  padding:8px;  
-  margin-top:10px;  
-}  
-.ig:hover{background:red;}  
-  
-/* warning */  
-.info{  
-  font-size:12px;  
-  color:#aaa;  
-  margin-top:15px;  
-  max-width:250px;  
-}  
-  
-/* header */  
-header{  
-  text-align:center;  
-  padding:20px;  
-  font-size:40px;  
-  font-family:'Nosifer', cursive;  
-  color:red;  
-  animation:shake 1.5s infinite;  
-}  
-  
-@keyframes shake{  
-  0%{transform:translate(0)}  
-  50%{transform:translate(-2px,2px)}  
-  100%{transform:translate(0)}  
-}  
-  
-/* gallery */  
-.gallery{  
-  display:grid;  
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));  
-  gap:10px;  
-  padding:20px;  
-}  
-  
-.gallery img{  
-  width:100%;  
-  border-radius:10px;  
-  transition:.3s;  
-}  
-.gallery img:hover{  
-  transform:scale(1.1);  
-}  
-  
-/* glitch text */  
-.glitch{  
-  text-align:center;  
-  font-size:30px;  
-  font-family:'Creepster';  
-  color:red;  
-  animation:flicker 3s infinite;  
-}  
-  
-/* flash */  
-#flash{  
-  position:fixed;  
-  width:100%;  
-  height:100%;  
-  background:red;  
-  opacity:0;  
-  pointer-events:none;  
-  z-index:999;  
-  transition:0.3s;  
-}  
-</style>  </head>  <body>  <div id="flash"></div>  <!-- LOGIN -->  <div class="login" id="login">  
-<h2 class="zalgo">M̷A̷S̷U̷K̷ ̷S̷E̷K̷A̷R̷A̷N̷G̷...</h2>  <button onclick="masuk()">ENTER</button>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Photo Booth Pro</title>
+  <style>
+    :root{
+      --bg:#0f1115; --card:#171a21; --text:#e8ecf1; --muted:#9aa3b2;
+      --accent:#6ea8fe; --danger:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
+      background:linear-gradient(180deg,#0b0d12,#121622);
+      color:var(--text);
+      display:flex; flex-direction:column; align-items:center; gap:14px; padding:14px;
+    }
+    .wrap{width:100%; max-width:420px}
+    .card{
+      background:var(--card); border-radius:16px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    h2{margin:6px 0 10px; text-align:center}
+    .stage{
+      position:relative; overflow:hidden; border-radius:14px; background:#000;
+    }
+    video, canvas{
+      width:100%; height:auto; display:block;
+    }
+    .overlay{
+      position:absolute; inset:0; pointer-events:none;
+      display:flex; align-items:center; justify-content:center;
+      font-size:56px; font-weight:700; color:#fff;
+      text-shadow:0 4px 20px rgba(0,0,0,.6);
+      opacity:0; transition:.2s;
+    }
+    .flash{
+      position:absolute; inset:0; background:#fff; opacity:0;
+      transition:opacity .15s ease;
+    }
+    .controls{
+      display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:10px;
+    }
+    button, select{
+      padding:10px 12px; border-radius:10px; border:none; cursor:pointer;
+      background:#232838; color:var(--text);
+    }
+    button.primary{background:var(--accent); color:#0b1220; font-weight:600}
+    button.warn{background:var(--danger); color:#200}
+    .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+    .small{font-size:12px; color:var(--muted)}
+    .preview{
+      margin-top:10px; border-radius:12px; overflow:hidden; background:#000;
+    }
+    .footer{font-size:12px; color:var(--muted); text-align:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2>📸 Photo Booth Pro</h2>
 
-<a href="https://www.instagram.com/4rknnnajaaa?igsh=MWM5cGNvbmJheDI5cw==" target="_blank" class="ig">  
-📱 FOLLOW IG GW  
-</a>  <p class="zalgo kecil">  
-J̷A̷N̷G̷A̷N̷ ̷L̷U̷P̷A̷ ̷F̷O̷L̷L̷O̷W̷ ̷A̷K̷U̷N̷ ̷G̷W̷  
-</p>  <p class="info">  
-⚠️ PERINGATAN ⚠️<br>  
-• Bukan Link P Bro<br>  
-• Punya @4rknnnajaa<br>  
-• Disarankan pakai headset 🎧  
-</p>  
-</div>  <!-- MAIN -->  <header>DANC0W😱</header>  
-<div class="glitch">YOU ARE WATCHED</div>  <div class="gallery">  
-<img src="motion_photo_7523844779172652385~2.jpg">  
-<img src="IMG_20260324_225639_424.jpg">  
-<img src="IMG_20260324_225639_382.jpg">  
-<img src="motion_photo_5823942349673579073.jpg">  
-<img src="motion_photo_7247671055954824122.jpg">  
-<img src="motion_photo_5808118521687866893~2.jpg">  
-</div>  <audio id="audio"></audio>
+      <div class="stage">
+        <video id="video" autoplay playsinline></video>
+        <div id="overlay" class="overlay">3</div>
+        <div id="flash" class="flash"></div>
+      </div>
 
-<script>  
-function masuk(){  
-  const flash = document.getElementById('flash');  
-  const audio = document.getElementById('audio');  
-  
-  flash.style.opacity = "1";  
-  
-  const enterSound = new Audio("original sound - 00.18.0h_musicaldown.com_1774641360.mp3");  
-  enterSound.volume = 0.9;  
-  enterSound.play();  
-  
-  setTimeout(()=>{  
-    flash.style.opacity = "0";  
-    document.getElementById('login').style.display='none';  
-  
-    audio.src = "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/Brazilian_Street/Komiku_-_03_-_Brazilian_Street.mp3";  
-    audio.play();  
-  },600);  
-}  
-  
-// smooth camera effect  
-setInterval(()=>{  
-  let x = (Math.random()-0.5)*2;  
-  let y = (Math.random()-0.5)*2;  
-  document.body.style.transform = `translate(${x}px, ${y}px)`;  
-},2000);  
-</script>  </body>  
+      <div class="controls">
+        <button id="btnStart" class="primary">Mulai Kamera</button>
+        <button id="btnSwitch">Ganti Kamera</button>
+
+        <button id="btnShot" class="primary">Ambil Foto</button>
+        <button id="btnCountdown">Countdown (3s)</button>
+
+        <select id="filter">
+          <option value="none">Filter: Normal</option>
+          <option value="vintage">Vintage</option>
+          <option value="bw">B/W</option>
+          <option value="warm">Warm</option>
+          <option value="cool">Cool</option>
+          <option value="contrast">High Contrast</option>
+        </select>
+        <button id="btnMirror">Mirror: OFF</button>
+      </div>
+
+      <div class="row">
+        <button id="btnDownload">Download</button>
+        <button id="btnClear" class="warn">Clear</button>
+      </div>
+
+      <div class="preview">
+        <canvas id="canvas"></canvas>
+      </div>
+
+      <div class="footer">Akan meminta izin kamera. Semua pemotretan dilakukan di perangkatmu.</div>
+    </div>
+  </div>
+
+<script>
+  const video = document.getElementById('video')
+  const canvas = document.getElementById('canvas')
+  const ctx = canvas.getContext('2d')
+  const overlay = document.getElementById('overlay')
+  const flash = document.getElementById('flash')
+
+  const btnStart = document.getElementById('btnStart')
+  const btnSwitch = document.getElementById('btnSwitch')
+  const btnShot = document.getElementById('btnShot')
+  const btnCountdown = document.getElementById('btnCountdown')
+  const btnDownload = document.getElementById('btnDownload')
+  const btnClear = document.getElementById('btnClear')
+  const filterSel = document.getElementById('filter')
+  const btnMirror = document.getElementById('btnMirror')
+
+  let stream = null
+  let facing = "user" // front/back
+  let mirror = false
+  let lastImage = null
+
+  async function startCamera(){
+    try{
+      if(stream) stream.getTracks().forEach(t=>t.stop())
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: facing }, audio:false
+      })
+      video.srcObject = stream
+    }catch(e){
+      alert("Kamera tidak diizinkan / tidak tersedia")
+    }
+  }
+
+  function switchCamera(){
+    facing = (facing === "user") ? "environment" : "user"
+    startCamera()
+  }
+
+  function setMirror(){
+    mirror = !mirror
+    video.style.transform = mirror ? "scaleX(-1)" : "scaleX(1)"
+    btnMirror.textContent = "Mirror: " + (mirror ? "ON" : "OFF")
+  }
+
+  function applyFilter(ctx, w, h){
+    const f = filterSel.value
+    if(f === "none") return
+    const img = ctx.getImageData(0,0,w,h)
+    const d = img.data
+
+    for(let i=0;i<d.length;i+=4){
+      let r=d[i], g=d[i+1], b=d[i+2]
+
+      if(f==="bw"){
+        const avg=(r+g+b)/3
+        d[i]=d[i+1]=d[i+2]=avg
+      }
+      if(f==="vintage"){
+        d[i]=r*0.9+20
+        d[i+1]=g*0.7+15
+        d[i+2]=b*0.4+10
+      }
+      if(f==="warm"){
+        d[i]=r+20
+      }
+      if(f==="cool"){
+        d[i+2]=b+20
+      }
+      if(f==="contrast"){
+        d[i]=((r-128)*1.4)+128
+        d[i+1]=((g-128)*1.4)+128
+        d[i+2]=((b-128)*1.4)+128
+      }
+    }
+
+    ctx.putImageData(img,0,0)
+  }
+
+  function takePhoto(){
+    const w = video.videoWidth
+    const h = video.videoHeight
+    canvas.width = w
+    canvas.height = h
+
+    if(mirror){
+      ctx.translate(w,0)
+      ctx.scale(-1,1)
+    }
+
+    ctx.drawImage(video,0,0,w,h)
+
+    if(mirror){
+      ctx.setTransform(1,0,0,1,0,0)
+    }
+
+    applyFilter(ctx,w,h)
+
+    // flash effect
+    flash.style.opacity = 1
+    setTimeout(()=> flash.style.opacity = 0, 120)
+
+    lastImage = canvas.toDataURL("image/png")
+  }
+
+  function countdownShot(){
+    let n = 3
+    overlay.style.opacity = 1
+    overlay.textContent = n
+
+    const timer = setInterval(()=>{
+      n--
+      if(n<=0){
+        clearInterval(timer)
+        overlay.style.opacity = 0
+        takePhoto()
+      } else {
+        overlay.textContent = n
+      }
+    },1000)
+  }
+
+  function download(){
+    if(!lastImage) return alert("Belum ada foto")
+    const a = document.createElement("a")
+    a.href = lastImage
+    a.download = "foto.png"
+    a.click()
+  }
+
+  function clearCanvas(){
+    ctx.clearRect(0,0,canvas.width,canvas.height)
+    lastImage = null
+  }
+
+  btnStart.onclick = startCamera
+  btnSwitch.onclick = switchCamera
+  btnMirror.onclick = setMirror
+  btnShot.onclick = takePhoto
+  btnCountdown.onclick = countdownShot
+  btnDownload.onclick = download
+  btnClear.onclick = clearCanvas
+</script>
+
+</body>
 </html>
