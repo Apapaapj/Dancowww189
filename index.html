@@ -1,123 +1,103 @@
+// ===== BACKEND (Node.js + Baileys) ===== // Save as: server.js
+
+const express = require('express'); const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys'); const qrcode = require('qrcode');
+
+const app = express(); app.use(express.json());
+
+let sock; let qrCodeData = null; let status = 'OFF';
+
+async function startBot() { const { state, saveCreds } = await useMultiFileAuthState('auth');
+
+sock = makeWASocket({ auth: state });
+
+sock.ev.on('creds.update', saveCreds);
+
+sock.ev.on('connection.update', async (update) => { const { connection, qr } = update;
+
+if (qr) {
+  qrCodeData = await qrcode.toDataURL(qr);
+}
+
+if (connection === 'open') {
+  status = 'RUNNING';
+  console.log('Bot connected');
+} else if (connection === 'close') {
+  status = 'OFF';
+  console.log('Bot disconnected');
+}
+
+});
+
+sock.ev.on('messages.upsert', async (msg) => { const m = msg.messages[0]; if (!m.message) return;
+
+const text = m.message.conversation || '';
+const from = m.key.remoteJid;
+
+if (text.toLowerCase() === 'ping') {
+  await sock.sendMessage(from, { text: 'pong 🏓' });
+}
+
+}); }
+
+function stopBot() { if (sock) { sock.ws.close(); status = 'OFF'; } }
+
+app.get('/status', (req, res) => { res.json({ status, qr: qrCodeData }); });
+
+app.post('/start', async (req, res) => { await startBot(); res.json({ message: 'Bot starting...' }); });
+
+app.post('/stop', (req, res) => { stopBot(); res.json({ message: 'Bot stopped' }); });
+
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+
+// ===== FRONTEND (index.html) =====
+
 <!DOCTYPE html><html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>616m Streetwear</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&display=swap" rel="stylesheet"><style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Oswald',sans-serif}
-body{background:#000;color:#fff;overflow-x:hidden}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Bot WA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white"><div class="min-h-screen flex flex-col items-center justify-center">
+  <div class="bg-gray-800 p-8 rounded-2xl w-full max-w-md">
+    <h1 class="text-xl font-bold mb-4 text-center">REAL PANEL BOT WA</h1><button onclick="startBot()" class="w-full bg-green-500 p-2 rounded mb-2">Start Bot</button>
+<button onclick="stopBot()" class="w-full bg-red-500 p-2 rounded">Stop Bot</button>
 
-header{
-position:fixed;top:0;width:100%;display:flex;justify-content:space-between;
-padding:20px 40px;z-index:1000;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px)
-}
+<p class="mt-4">Status: <span id="status">OFF</span></p>
 
-header h1{letter-spacing:4px;font-size:20px}
-
-.hero{
-height:100vh;
-display:flex;align-items:center;justify-content:center;
-position:relative;text-align:center
-}
-
-.hero video{
-position:absolute;width:100%;height:100%;object-fit:cover;top:0;left:0;z-index:0
-}
-
-.hero::after{
-content:'';position:absolute;inset:0;background:rgba(0,0,0,0.65)
-}
-
-.hero-content{
-position:relative;z-index:2
-}
-
-.hero h2{font-size:60px;letter-spacing:6px}
-.hero p{opacity:0.7;letter-spacing:2px}
-
-.btn{
-margin-top:20px;padding:12px 30px;background:#fff;color:#000;border:none;
-border-radius:30px;cursor:pointer;font-weight:700
-}
-
-.marquee{
-overflow:hidden;white-space:nowrap;background:#111;padding:10px 0;
-font-size:14px;letter-spacing:3px
-}
-
-.marquee span{
-display:inline-block;padding-left:100%;animation:scroll 12s linear infinite
-}
-
-@keyframes scroll{
-0%{transform:translateX(0)}
-100%{transform:translateX(-100%)}
-}
-
-.products{
-padding:80px 40px;
-display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px
-}
-
-.card{
-background:#0f0f0f;border-radius:20px;overflow:hidden;transition:0.4s
-}
-
-.card:hover{transform:scale(1.05)}
-
-.card img{width:100%;height:320px;object-fit:cover}
-
-.info{padding:15px}
-
-.section-dark{
-padding:80px 40px;text-align:center;background:#050505
-}
-
-.big-text{font-size:40px;letter-spacing:5px}
-
-.section{padding:40px}
-
-footer{text-align:center;padding:30px;background:#000;opacity:0.5}
-
-</style></head>
-<body><header>
-<h1>616M</h1>
-</header><section class="hero"><video autoplay muted loop playsinline>
-  <source src="https://cdn.coverr.co/videos/coverr-urban-fashion-5176/1080p.mp4" type="video/mp4">
-</video><div class="hero-content">
-<h2>NO RULES.</h2>
-<p>JUST STYLE.</p>
-<button class="btn" onclick="scrollToProducts()">SHOP NOW</button>
-</div></section><div class="marquee">
-<span>616M STREETWEAR — LIMITED DROP — NO RESTOCK — BUILT DIFFERENT — </span>
-</div><section id="products" class="products"><div class="card">
-<img src="https://via.placeholder.com/300">
-<div class="info">
-<h3>Hoodie Boxy 2 Zip</h3>
-<p>Rp 175.000</p>
-<button class="btn" onclick="order()">GET YOURS</button>
+<div class="mt-4">
+  <img id="qr" class="w-full" />
 </div>
-</div></section><section class="section-dark">
-<h2 class="big-text">LIMITED MEANS LIMITED</h2>
-<p style="opacity:0.6;margin-top:10px">Once it's sold out, it's gone.</p>
-</section><section class="section">
-<h2>Cara Order</h2>
-<p>1. Pilih produk</p>
-<p>2. Bayar via QRIS / DANA: 089525437196</p>
-<p>3. Kirim bukti ke WhatsApp</p>
-<a class="btn" href="https://wa.me/6289525437196">Chat WhatsApp</a>
-</section><section class="section">
-<h2>Pembayaran QRIS</h2>
-<img src="YOUR_QRIS_IMAGE_HERE">
-</section><footer>
-<p>616m.sosm@gmail.com</p>
-</footer><script>
-function scrollToProducts(){
-  document.getElementById('products').scrollIntoView({behavior:'smooth'});
+
+  </div>
+</div><script>
+async function startBot() {
+  await fetch('http://localhost:3000/start', { method: 'POST' });
 }
 
-function order(){
-  window.open('https://wa.me/6289525437196?text=Saya%20mau%20order%20Hoodie%20616M');
+async function stopBot() {
+  await fetch('http://localhost:3000/stop', { method: 'POST' });
 }
+
+async function updateStatus() {
+  const res = await fetch('http://localhost:3000/status');
+  const data = await res.json();
+
+  document.getElementById('status').innerText = data.status;
+
+  if (data.qr) {
+    document.getElementById('qr').src = data.qr;
+  }
+}
+
+setInterval(updateStatus, 2000);
 </script></body>
-</html>
+</html>// ===== CARA JALANIN =====
+
+// 1. Install Node.js // 2. Jalankan: // npm init -y // npm install express @whiskeysockets/baileys qrcode
+
+// 3. Run server: // node server.js
+
+// 4. Buka index.html di browser // 5. Klik START → scan QR
+
+// DONE 🔥
