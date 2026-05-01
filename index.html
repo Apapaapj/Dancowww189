@@ -1,138 +1,123 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo Game Dashboard</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>616m Streetwear</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&display=swap" rel="stylesheet"><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Oswald',sans-serif}
+body{background:#000;color:#fff;overflow-x:hidden}
 
-    body {
-      background: radial-gradient(circle at top, #1b1b2f, #000);
-      color: white;
-      min-height: 100vh;
-    }
-
-    header {
-      padding: 20px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(10px);
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
-    }
-
-    .balance {
-      background: rgba(255,255,255,0.08);
-      padding: 15px;
-      border-radius: 15px;
-      text-align: center;
-      margin-bottom: 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-
-    .balance h2 {
-      font-size: 28px;
-      color: #00ffcc;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
-    }
-
-    .card {
-      background: rgba(255,255,255,0.07);
-      padding: 20px;
-      border-radius: 15px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      background: rgba(255,255,255,0.12);
-    }
-
-    .popup {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .popup-box {
-      background: #111;
-      padding: 30px;
-      border-radius: 15px;
-      text-align: center;
-      max-width: 300px;
-    }
-
-    .popup-box button {
-      margin-top: 15px;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 10px;
-      background: #00ffcc;
-      cursor: pointer;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-
-<header>🎮Game Dashboard</header>
-
-<div class="container">
-
-  <div class="balance">
-    <p> Balance</p>
-    <h2>Rp 3.000.000</h2>
-    <small style="opacity:0.7">*JIKA ANDA INGIN MENARIK UANG INI WAJIB DEPOSIT TERLEBIH DAHULU MINIMAL 200K*</small>
-  </div>
-
-  <div class="grid">
-    <div class="card" onclick="openPopup('Mahjong')">🀄 Mahjong</div>
-    <div class="card" onclick="openPopup('Space Adventure')">🚀 Space</div>
-    <div class="card" onclick="openPopup('Puzzle Game')">🧩 Puzzle</div>
-    <div class="card" onclick="openPopup('Card Game')">🂰 Cards</div>
-  </div>
-
-</div>
-
-<div class="popup" id="popup">
-  <div class="popup-box">
-    <h3 id="popupText">Game</h3>
-    <p style="margin-top:10px">Mode Slot - DEPOSIT TERLEBIH DAHULU HUB 085168143056</p>
-    <button onclick="closePopup()">OUT</button>
-  </div>
-</div>
-
-<script>
-function openPopup(name){
-  document.getElementById('popupText').innerText = name;
-  document.getElementById('popup').style.display = 'flex';
+header{
+position:fixed;top:0;width:100%;display:flex;justify-content:space-between;
+padding:20px 40px;z-index:1000;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px)
 }
 
-function closePopup(){
-  document.getElementById('popup').style.display = 'none';
-}
-</script>
+header h1{letter-spacing:4px;font-size:20px}
 
-</body>
+.hero{
+height:100vh;
+display:flex;align-items:center;justify-content:center;
+position:relative;text-align:center
+}
+
+.hero video{
+position:absolute;width:100%;height:100%;object-fit:cover;top:0;left:0;z-index:0
+}
+
+.hero::after{
+content:'';position:absolute;inset:0;background:rgba(0,0,0,0.65)
+}
+
+.hero-content{
+position:relative;z-index:2
+}
+
+.hero h2{font-size:60px;letter-spacing:6px}
+.hero p{opacity:0.7;letter-spacing:2px}
+
+.btn{
+margin-top:20px;padding:12px 30px;background:#fff;color:#000;border:none;
+border-radius:30px;cursor:pointer;font-weight:700
+}
+
+.marquee{
+overflow:hidden;white-space:nowrap;background:#111;padding:10px 0;
+font-size:14px;letter-spacing:3px
+}
+
+.marquee span{
+display:inline-block;padding-left:100%;animation:scroll 12s linear infinite
+}
+
+@keyframes scroll{
+0%{transform:translateX(0)}
+100%{transform:translateX(-100%)}
+}
+
+.products{
+padding:80px 40px;
+display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px
+}
+
+.card{
+background:#0f0f0f;border-radius:20px;overflow:hidden;transition:0.4s
+}
+
+.card:hover{transform:scale(1.05)}
+
+.card img{width:100%;height:320px;object-fit:cover}
+
+.info{padding:15px}
+
+.section-dark{
+padding:80px 40px;text-align:center;background:#050505
+}
+
+.big-text{font-size:40px;letter-spacing:5px}
+
+.section{padding:40px}
+
+footer{text-align:center;padding:30px;background:#000;opacity:0.5}
+
+</style></head>
+<body><header>
+<h1>616M</h1>
+</header><section class="hero"><video autoplay muted loop playsinline>
+  <source src="https://cdn.coverr.co/videos/coverr-urban-fashion-5176/1080p.mp4" type="video/mp4">
+</video><div class="hero-content">
+<h2>NO RULES.</h2>
+<p>JUST STYLE.</p>
+<button class="btn" onclick="scrollToProducts()">SHOP NOW</button>
+</div></section><div class="marquee">
+<span>616M STREETWEAR — LIMITED DROP — NO RESTOCK — BUILT DIFFERENT — </span>
+</div><section id="products" class="products"><div class="card">
+<img src="https://via.placeholder.com/300">
+<div class="info">
+<h3>Hoodie Boxy 2 Zip</h3>
+<p>Rp 175.000</p>
+<button class="btn" onclick="order()">GET YOURS</button>
+</div>
+</div></section><section class="section-dark">
+<h2 class="big-text">LIMITED MEANS LIMITED</h2>
+<p style="opacity:0.6;margin-top:10px">Once it's sold out, it's gone.</p>
+</section><section class="section">
+<h2>Cara Order</h2>
+<p>1. Pilih produk</p>
+<p>2. Bayar via QRIS / DANA: 089525437196</p>
+<p>3. Kirim bukti ke WhatsApp</p>
+<a class="btn" href="https://wa.me/6289525437196">Chat WhatsApp</a>
+</section><section class="section">
+<h2>Pembayaran QRIS</h2>
+<img src="YOUR_QRIS_IMAGE_HERE">
+</section><footer>
+<p>616m.sosm@gmail.com</p>
+</footer><script>
+function scrollToProducts(){
+  document.getElementById('products').scrollIntoView({behavior:'smooth'});
+}
+
+function order(){
+  window.open('https://wa.me/6289525437196?text=Saya%20mau%20order%20Hoodie%20616M');
+}
+</script></body>
 </html>
